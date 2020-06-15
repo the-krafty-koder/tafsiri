@@ -1,0 +1,14 @@
+{
+  "name": "tafsiri",
+  "version": "1.0.0",
+  "description": "A node package that obtains and downloads subtitles in multiple languages for all your favorites series/shows from the command-line",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "mocha": "^7.1.1"
+  },
+  "author": "Omoga Omondi",
+  "license": "ISC"
+}
