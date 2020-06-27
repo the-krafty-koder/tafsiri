@@ -1,9 +1,14 @@
-const chalk = require("chalk")
-const clear = require("clear");
-const figlet = require("figlet");
-const { listUserCommands, validateFlags } = require("./lib/commands");
+import chalk from "chalk";
+import clear from "clear";
+import figlet from "figlet";
+import ora from "ora";
+import { listUserCommands, validateFlags } from "./lib/commands.js";
+import { searchInOpen } from "./lib/fetcher/fetch.js";
 
 const MINIMUM_ARGUMENT_LENGTH = 4;
+const boundary = "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+";
+
+const log = console.log;
 
 
 class Main {
@@ -11,7 +16,6 @@ class Main {
 	constructor(){
 		this.initializeScreen();
 		[ this.film,this.season,this.episode,this.language ] = this.getUserCommands();
-		console.log(this.film + this.season);
 		
 	};
 
@@ -21,22 +25,21 @@ class Main {
 	 **/
 	initializeScreen(){
 
-		console.log(
-			chalk.red(figlet.textSync("TAFSIRI",{ horizontalLayout: 'full' }))
+		log(
+			chalk.red(figlet.textSync("TAFSIRI!",{ horizontalLayout: 'full' }))
 		);
 	};
 
 	/**
 	 * getUserCommands() -> Array
 	 * Retrieves command-line arguments from user
-	 * Returns an array of strings
+	 * Returns an list of strings
 	 **/
 	getUserCommands(){
 		//
 
 		let user_commands = listUserCommands();
 		let flags = Object.keys(user_commands).slice(1);
-		console.log(user_commands);
  
 		const arg_length = flags.length + user_commands._.length;
 		const arg_index = {f:0,s:1,e:2,l:3};
@@ -45,7 +48,7 @@ class Main {
 
 			let difference = Object.keys(arg_index).filter(x => flags.includes(x));
 
-			for(flag of difference){
+			for(let flag of difference){
 				 user_commands._.splice(arg_index[flag],0,user_commands[flag]);
 			};
 
@@ -55,6 +58,19 @@ class Main {
 
 	};
 
+	/**
+	 * fetchInfo() -> Array
+	 * Determines sites where subtitles are available,
+	 * returns array of sites if found,error prompt if none.
+	 **/
+	async fetchInfo(){
+		/*  */
+		for await (let [ name,link ] of searchInOpen(this.film,this.season,this.episode,"spa")) {
+				log(`\n${name}`);
+				log(link);
+				log(chalk.green((boundary)));
+		}
+	};
 
 	/**
 	 * downloadSubtitles() -> Void
@@ -65,23 +81,16 @@ class Main {
 	};
 
 	/**
-	 * fetchInfo() -> Array
-	 * Determines sites where subtitles are available,
-	 * returns array of sites if found,error prompt if none.
-	 **/
-	fetchInfo(){
-		/*  */
-
-		return null;
-	};
-
-	/**
 	 * run() -> Void
 	 * Runs the whole thing :-)
 	 **/
 	run(){
+		log(chalk.cyan(figlet.textSync("Searching...")));
+		let spinner  = ora().start();
 
-		return null;
+		this.fetchInfo().then(setTimeout(()=>{
+			spinner.succeed();
+		},2000));
 	};
 
 }
