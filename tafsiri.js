@@ -4,6 +4,8 @@ import figlet from "figlet";
 import ora from "ora";
 import { listUserCommands, validateFlags } from "./lib/commands.js";
 import { searchInOpen } from "./lib/fetcher/fetch.js";
+import { getFile,getURL } from "./lib/downloader/save.js";
+
 
 const MINIMUM_ARGUMENT_LENGTH = 4;
 const boundary = "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+";
@@ -77,7 +79,10 @@ class Main {
 	 * Downloads subtitles from relevant sites
 	 **/
 	downloadSubtitles(){
-		return null
+		getURL(this.film,this.season,this.episode,"spa").then((args) => {
+			let [url,filename] = args;
+			getFile(`${filename}.zip`,url).then(res => log("Download Done"));
+		});
 	};
 
 	/**
@@ -91,6 +96,8 @@ class Main {
 		this.fetchInfo().then(setTimeout(()=>{
 			spinner.succeed();
 		},2000));
+
+		this.downloadSubtitles();
 	};
 
 }
