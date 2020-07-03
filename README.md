@@ -5,6 +5,8 @@
 
 Tafsiri is a command-line tool that enables subtitiles download for  your favorite movies/shows in multiple languages.Tafsiri is also a Swahili word that means 'translate'.
 
+!["tafsiri gif"](tafsiri.gif)
+
 # Features!
 With Tafsiri you can do the following:
 
@@ -50,8 +52,6 @@ Tafsiri accepts a number of flags as input parameters(command-line-arguments)
 Tafsiri has to  have a minimum of one flag to run
 
 Example:
-!["tafsiri gif"](tafsiri.gif)
-tafsiri.gif
 ```sh
 $ node tafsiri Ozark -s=3 5 Spanish
 ```
