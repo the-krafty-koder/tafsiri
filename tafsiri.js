@@ -1,17 +1,14 @@
 import chalk from "chalk";
-import clear from "clear";
 import figlet from "figlet";
 import ora from "ora";
-import { listUserCommands, validateFlags } from "./lib/commands.js";
+import { listUserCommands, validateFlags, validateLanguage } from "./lib/commands.js";
 import { searchInOpen } from "./lib/fetcher/fetch.js";
 import { getFile,getURL } from "./lib/downloader/save.js";
+import { languages } from "./lib/common_languages.js";
 
-
-const MINIMUM_ARGUMENT_LENGTH = 4;
 const boundary = "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+";
 
 const log = console.log;
-
 
 class Main {
 
@@ -26,7 +23,6 @@ class Main {
 	 * Writes welcome message, creates ASCII art from text
 	 **/
 	initializeScreen(){
-
 		log(
 			chalk.red(figlet.textSync("TAFSIRI!",{ horizontalLayout: 'full' }))
 		);
@@ -38,8 +34,6 @@ class Main {
 	 * Returns an list of strings
 	 **/
 	getUserCommands(){
-		//
-
 		let user_commands = listUserCommands();
 		let flags = Object.keys(user_commands).slice(1);
  
@@ -61,13 +55,25 @@ class Main {
 	};
 
 	/**
+	 * getLanguageCode() -> Str,
+	 * Returns a language code if supported,error prompt if none.
+	 **/
+	getLanguageCode(){
+
+		const isValid = validateLanguage(this.language);
+		if(isValid){
+			return languages[this.language]
+		}	
+	};
+
+	/**
 	 * fetchInfo() -> Array
 	 * Determines sites where subtitles are available,
 	 * returns array of sites if found,error prompt if none.
 	 **/
 	async fetchInfo(){
-		/*  */
-		for await (let [ name,link ] of searchInOpen(this.film,this.season,this.episode,"spa")) {
+		this.languageCode = this.getLanguageCode(this.language)
+		for await (let [ name,link ] of searchInOpen(this.film,this.season,this.episode,this.languageCode)) {
 				log(`\n${name}`);
 				log(link);
 				log(chalk.green((boundary)));
@@ -79,9 +85,13 @@ class Main {
 	 * Downloads subtitles from relevant sites
 	 **/
 	downloadSubtitles(){
-		getURL(this.film,this.season,this.episode,"spa").then((args) => {
+		getURL(this.film,this.season,this.episode,this.languageCode).then((args) => {
 			let [url,filename] = args;
-			getFile(`${filename}.zip`,url).then(res => log("Download Done"));
+			getFile(`${filename}.zip`,url).then(_ => log("Download Done"));
+		}).catch(error => {
+			if(error instanceof TypeError){
+				log('Subtitles not available at this time');
+			}
 		});
 	};
 
