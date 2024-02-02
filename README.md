@@ -4,6 +4,7 @@
 
 
 Tafsiri is a command-line tool that enables subtitiles download for  your favorite movies/shows in multiple languages.Tafsiri is also a Swahili word that means 'translate'.
+Access tafsiri on the web [here](https://sytch.co)
 
 !["tafsiri gif"](tafsiri.gif)
 
